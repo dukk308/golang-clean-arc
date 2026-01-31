@@ -1,0 +1,62 @@
+# .golangci.yml - tối ưu cho best practice, performance, security
+run:
+  timeout: 5m
+
+linters:
+  enable:
+    - staticcheck     # detect inefficiencies, e.g. time.Sleep(0) does nothing
+    - errcheck        # detect unchecked errors, e.g. io.Copy(dst, src) without checking err
+    - gocritic        # suggest better code, e.g. if len(s) != 0 → if s != ""
+    - gofmt           # enforce gofmt, e.g. fmt.Println( "hi" ) → fmt.Println("hi")
+    - goimports       # auto-fix import order, e.g. unused "fmt"
+    - goconst         # detect repeated literals, e.g. "admin" appears multiple times
+    - revive          # modern replacement for golint, e.g. redundant type names
+    - dogsled         # detect too many _ in assignment, e.g. a, _, _ := fn()
+    - misspell        # detect typos, e.g. "funcion" → "function"
+    - gosec           # detect SQL injection, weak crypto, hardcoded secrets
+    - errorlint       # enforce correct error handling, e.g. use errors.Is instead of ==
+
+linters-settings:
+  errcheck:
+    severity: error
+    check-type-assertions: true  # enable check type assertions because it's a good practice
+    check-blank: false   # disable check blank because it's not a good practice
+  gosimple:
+    checks:
+      - all
+      - -S1029
+  staticcheck:
+    checks:
+      - all
+      - -SA6003 # disable SA6003 because it's not a good practice
+      - -SA1019 # disable deprecated API check globally
+      - -ST1001 # disable don't use dot imports
+  dogsled:
+    ignore-generated-header: true
+    severity: warning
+    rules:
+      - name: unused-assignment
+        enabled: true
+        message: "don't use unused assignment"
+        level: error
+
+  revive:
+    ignore-generated-header: true
+    severity: warning
+    rules:
+      - name: import-shadowing        # Warns if a variable name shadows an imported package
+      - name: indent-error-flow       # Checks indentation in error handling blocks
+      - name: blank-imports           # Warns about unused blank imports (_ "package")
+      - name: increment-decrement     # Warns when using i++ or i-- inside expressions instead of standalone statements
+      - name: unexported-return       # Warns if a public function returns an unexported (private) type
+      - name: unexported-naming       # Checks that unexported variable/function names follow Go naming conventions
+      - name: unhandled-error         # Warns about returned errors that are not handled
+
+issues:
+  exclude-files:
+    - ".*_gen.go"
+    
+output:
+  formats:
+    - format: colored-line-number
+  sort-results: true

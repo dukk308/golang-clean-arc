@@ -1,0 +1,12 @@
+basePath: /api
+consumes:
+- application/json
+info:
+  contact: {}
+  description: Golang Clean Arc Starter API.
+  title: Golang Clean Arc Starter API
+  version: "1.0"
+paths: {}
+produces:
+- application/json
+swagger: "2.0"
