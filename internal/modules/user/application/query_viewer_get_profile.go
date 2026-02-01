@@ -7,17 +7,17 @@ import (
 	"github.com/dukk308/beetool.dev-go-starter/pkgs/base"
 )
 
-type GetProfileQuery struct {
+type ViewerGetProfileQuery struct {
 	repository domain.IViewerRepository
 }
 
-func NewGetProfileQuery(repository domain.IViewerRepository) *GetProfileQuery {
-	return &GetProfileQuery{
+func NewViewerGetProfileQuery(repository domain.IViewerRepository) *ViewerGetProfileQuery {
+	return &ViewerGetProfileQuery{
 		repository: repository,
 	}
 }
 
-func (q *GetProfileQuery) Execute(ctx context.Context, userID string) (*domain.DTOProfileResponse, error) {
+func (q *ViewerGetProfileQuery) Execute(ctx context.Context, userID string) (*domain.DTOProfileResponse, error) {
 	viewer, err := q.repository.GetByID(ctx, userID)
 	if err != nil {
 		return nil, base.ToDomainError(err)

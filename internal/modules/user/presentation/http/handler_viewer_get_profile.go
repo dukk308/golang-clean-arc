@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h *Http) HandlerGetProfile() gin.HandlerFunc {
+func (h *Http) HandlerViewerGetProfile() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userID, exists := c.Get("userID")
 		if !exists {
@@ -21,7 +21,7 @@ func (h *Http) HandlerGetProfile() gin.HandlerFunc {
 		}
 
 		ctx := c.Request.Context()
-		response, err := h.getProfileQuery.Execute(ctx, userIDStr)
+		response, err := h.viewerGetProfileQuery.Execute(ctx, userIDStr)
 		if err != nil {
 			gin_comp.ResponseError(c, err)
 			return

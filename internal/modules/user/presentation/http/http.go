@@ -7,17 +7,17 @@ import (
 )
 
 type Http struct {
-	getProfileQuery *application.GetProfileQuery
-	tokenService    auth_domain.ITokenService
+	viewerGetProfileQuery *application.ViewerGetProfileQuery
+	tokenService          auth_domain.ITokenService
 }
 
 func NewHttp(
-	getProfileQuery *application.GetProfileQuery,
+	viewerGetProfileQuery *application.ViewerGetProfileQuery,
 	tokenService auth_domain.ITokenService,
 ) *Http {
 	return &Http{
-		getProfileQuery: getProfileQuery,
-		tokenService:    tokenService,
+		viewerGetProfileQuery: viewerGetProfileQuery,
+		tokenService:          tokenService,
 	}
 }
 
@@ -25,6 +25,6 @@ func (h *Http) RegisterRoutes(router *gin.RouterGroup) {
 	accountGroup := router.Group("/v1/account")
 	accountGroup.Use(AuthMiddleware(h.tokenService))
 	{
-		accountGroup.GET("/profile", h.HandlerGetProfile())
+		accountGroup.GET("/profile", h.HandlerViewerGetProfile())
 	}
 }

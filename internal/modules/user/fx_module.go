@@ -17,14 +17,14 @@ var Module = fx.Module("user",
 		),
 	),
 	fx.Provide(
-		application.NewGetProfileQuery,
+		application.NewViewerGetProfileQuery,
 	),
 	fx.Provide(
 		func(
-			getProfileQuery *application.GetProfileQuery,
+			viewerGetProfileQuery *application.ViewerGetProfileQuery,
 			tokenService auth_domain.ITokenService,
 		) *user_http.Http {
-			return user_http.NewHttp(getProfileQuery, tokenService)
+			return user_http.NewHttp(viewerGetProfileQuery, tokenService)
 		},
 	),
 )
