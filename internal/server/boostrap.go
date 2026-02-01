@@ -24,19 +24,19 @@ func startHttpServer(
 	globalConfig *global_config.GlobalConfig,
 	log logger.Logger,
 ) {
-	router := ginComponent.GetRouter()
-	router.Use(middleware.CORS())
-	router.Use(middleware.Tracer(globalConfig))
-	router.Use(middleware.CorrelateLogger(log))
-	router.Use(middleware.Logger(
+	group := ginComponent.GetGroup()
+	group.Use(middleware.CORS())
+	group.Use(middleware.Tracer(globalConfig))
+	group.Use(middleware.CorrelateLogger(log))
+	group.Use(middleware.Logger(
 		globalConfig.IsLogRequest,
 		globalConfig.IsLogResponse,
 	))
-	swaggerComponent.RegisterRoutes(router)
+	swaggerComponent.RegisterRoutes(ginComponent.GetRouter())
 
 	httpServer := &http.Server{
 		Addr:    fmt.Sprintf(":%s", ginComponent.GetConfig().Port),
-		Handler: router,
+		Handler: ginComponent.GetRouter(),
 	}
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {

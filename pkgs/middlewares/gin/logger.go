@@ -41,7 +41,7 @@ func Logger(isLogRequest bool, isLogResponse bool) gin.HandlerFunc {
 
 		if isLogRequest && !excluded {
 			log := logger.FromContext(c.Request.Context())
-			logRequestDetails(c, log)
+			logRequest(c, log)
 		}
 
 		blw := &responseWriter{
@@ -57,12 +57,12 @@ func Logger(isLogRequest bool, isLogResponse bool) gin.HandlerFunc {
 
 		if !excluded && (isLogResponse || statusCode >= 400) {
 			log := logger.FromContext(c.Request.Context())
-			logResponseDetails(c, log, statusCode, duration, blw.body.String())
+			logResponse(c, log, statusCode, duration, blw.body.String())
 		}
 	}
 }
 
-func logRequestDetails(c *gin.Context, logger logger.Logger) {
+func logRequest(c *gin.Context, logger logger.Logger) {
 	requestBody := ""
 	contentType := c.ContentType()
 
@@ -107,7 +107,7 @@ func logRequestDetails(c *gin.Context, logger logger.Logger) {
 	logger.Info(logMsg)
 }
 
-func logResponseDetails(c *gin.Context, logger logger.Logger, statusCode int, duration time.Duration, responseBody string) {
+func logResponse(c *gin.Context, logger logger.Logger, statusCode int, duration time.Duration, responseBody string) {
 	logMsg := fmt.Sprintf(
 		"[RESPONSE] %s %s | Status: %d | Duration: %v",
 		c.Request.Method,
