@@ -1,4 +1,4 @@
-package tracer
+package otel_comp
 
 type options struct {
 	Name      string
