@@ -2,15 +2,22 @@ package validation
 
 import (
 	"errors"
-	"regexp"
+	"reflect"
+	"strings"
 
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
 )
 
-var (
-	emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
-)
+func jsonFormQueryTagName(field reflect.StructField) string {
+	for _, tag := range []string{"json", "form", "query"} {
+		name := strings.SplitN(field.Tag.Get(tag), ",", 2)[0]
+		if name != "" && name != "-" {
+			return name
+		}
+	}
+	return field.Name
+}
 
 func RegisterValidations() error {
 	if binding.Validator == nil {
@@ -27,17 +34,9 @@ func RegisterValidations() error {
 		return errors.New("validator engine is not *validator.Validate")
 	}
 
+	v.RegisterTagNameFunc(jsonFormQueryTagName)
+
 	if err := ValidateEmail(v); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func ValidateEmail(v *validator.Validate) error {
-	if err := v.RegisterValidation("email", func(fl validator.FieldLevel) bool {
-		return emailRegex.MatchString(fl.Field().String())
-	}); err != nil {
 		return err
 	}
 

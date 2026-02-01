@@ -7,6 +7,7 @@ import (
 
 	"github.com/dukk308/beetool.dev-go-starter/internal/config"
 	"github.com/dukk308/beetool.dev-go-starter/internal/modules"
+	"github.com/dukk308/beetool.dev-go-starter/internal/validation"
 	"github.com/dukk308/beetool.dev-go-starter/pkgs/components/gin_comp"
 	"github.com/dukk308/beetool.dev-go-starter/pkgs/components/gorm_comp"
 	"github.com/dukk308/beetool.dev-go-starter/pkgs/components/swagger_comp"
@@ -15,6 +16,12 @@ import (
 	middleware "github.com/dukk308/beetool.dev-go-starter/pkgs/middlewares/gin"
 	"go.uber.org/fx"
 )
+
+func registerValidation(log logger.Logger) {
+	if err := validation.RegisterValidations(); err != nil {
+		log.Errorf("Failed to register validations: %v", err)
+	}
+}
 
 func startHttpServer(
 	lc fx.Lifecycle,
@@ -60,6 +67,7 @@ func Bootstrap(ctx context.Context) *fx.App {
 		logger.ZapModuleFx,
 		config.ConfigModuleFx,
 		fx.WithLogger(logger.ProvideFXEventLogger),
+		fx.Invoke(registerValidation),
 		fx.Options(
 			gorm_comp.GormComponentFx,
 			gin_comp.GinComponentFx,
