@@ -12,6 +12,7 @@ import (
 	"github.com/dukk308/beetool.dev-go-starter/pkgs/components/swagger_comp"
 	"github.com/dukk308/beetool.dev-go-starter/pkgs/global_config"
 	"github.com/dukk308/beetool.dev-go-starter/pkgs/logger"
+	middleware "github.com/dukk308/beetool.dev-go-starter/pkgs/middlewares/gin"
 	"go.uber.org/fx"
 )
 
@@ -20,9 +21,17 @@ func startHttpServer(
 	ginComponent *gin_comp.GinEngine,
 	swaggerComponent *swagger_comp.SwaggerComponent,
 	config *config.Config,
+	globalConfig *global_config.GlobalConfig,
 	log logger.Logger,
 ) {
 	router := ginComponent.GetRouter()
+	router.Use(middleware.CORS())
+	router.Use(middleware.Tracer(globalConfig))
+	router.Use(middleware.CorrelateLogger(log))
+	router.Use(middleware.Logger(
+		globalConfig.IsLogRequest,
+		globalConfig.IsLogResponse,
+	))
 	swaggerComponent.RegisterRoutes(router)
 
 	httpServer := &http.Server{

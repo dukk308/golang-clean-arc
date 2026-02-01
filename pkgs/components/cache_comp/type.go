@@ -6,14 +6,7 @@ import (
 
 	"github.com/go-redis/cache/v9"
 	"github.com/redis/go-redis/v9"
-	"golang.org/x/sync/singleflight"
 )
-
-type SingleflightResult struct {
-	Value  interface{}
-	Err    error
-	Shared bool
-}
 
 type ICacheService interface {
 	Get(context context.Context, key string) (*string, error)
@@ -58,10 +51,4 @@ type ICacheService interface {
 	GetCache() *cache.Cache
 	ConfigureCache(localCacheSize int, localCacheTTL time.Duration)
 	DisableLocalCache()
-
-	SingleflightDo(key string, fn func() (interface{}, error)) (interface{}, error, bool)
-	SingleflightCacheOnce(ctx context.Context, key string, value interface{}, ttl time.Duration, fetch func(*cache.Item) (interface{}, error)) (*SingleflightResult, error)
-	SingleflightCacheGet(ctx context.Context, key string, value interface{}, ttl time.Duration, fetch func() (interface{}, error)) (*SingleflightResult, error)
-	SingleflightForget(key string)
-	SingleflightDoChan(key string, fn func() (interface{}, error)) <-chan singleflight.Result
 }

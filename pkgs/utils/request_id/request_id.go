@@ -3,11 +3,8 @@ package request_id
 import (
 	"context"
 	"net/http"
-	"os"
 
 	"github.com/dukk308/beetool.dev-go-starter/pkgs/constants"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/trace"
 )
 
 // Provider represents the interface for the request id provider.
@@ -21,13 +18,7 @@ type Factory func() (string, error)
 // prioritize using the trace ID from the span context.
 func RequestID(factory Factory) Provider {
 	return func(w http.ResponseWriter, r *http.Request) (string, error) {
-		var id string
-
-		if traceID := getTraceIDFromContext(r.Context()); traceID != "" {
-			id = traceID
-		} else {
-			id = r.Header.Get(constants.ContextKeyRequestID)
-		}
+		var id = r.Header.Get(constants.ContextKeyRequestID)
 
 		if id == "" {
 			var err error
@@ -53,31 +44,4 @@ func WithValue(ctx context.Context, reqID string) context.Context {
 func Value(ctx context.Context) (string, bool) {
 	id, ok := ctx.Value(constants.ContextKeyRequestID).(string)
 	return id, ok
-}
-
-// isTracingEnabled checks if OpenTelemetry tracing is enabled
-func isTracingEnabled() bool {
-	enabled := os.Getenv("TRACER_ENABLED")
-	if enabled == "true" || enabled == "1" {
-		return true
-	}
-	tracerProvider := otel.GetTracerProvider()
-	return tracerProvider != nil
-}
-
-// getTraceIDFromContext extracts trace ID from OpenTelemetry span context if available
-func getTraceIDFromContext(ctx context.Context) string {
-	if !isTracingEnabled() {
-		return ""
-	}
-	span := trace.SpanFromContext(ctx)
-	spanCtx := span.SpanContext()
-	if !spanCtx.IsValid() {
-		return ""
-	}
-	traceID := spanCtx.TraceID()
-	if traceID.IsValid() {
-		return traceID.String()
-	}
-	return ""
 }

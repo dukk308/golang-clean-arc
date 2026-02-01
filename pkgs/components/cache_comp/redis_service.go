@@ -8,9 +8,7 @@ import (
 
 	"github.com/go-redis/cache/v9"
 	"github.com/go-redsync/redsync/v4"
-	redsync_goredis "github.com/go-redsync/redsync/v4/redis/goredis/v9"
 	"github.com/redis/go-redis/v9"
-	"golang.org/x/sync/singleflight"
 )
 
 type RedisClient struct {
@@ -18,7 +16,6 @@ type RedisClient struct {
 	c       redis.UniversalClient
 	timeout time.Duration
 	cache   *cache.Cache
-	group   singleflight.Group
 	redsync *redsync.Redsync
 }
 
@@ -34,8 +31,6 @@ func NewStandAloneRedisClient(prefix string, timeout time.Duration, c *redis.Cli
 	if prefix != "" {
 		prefix = prefix + ":"
 	}
-	pool := redsync_goredis.NewPool(c)
-	rs := redsync.New(pool)
 
 	cacheInstance := cache.New(&cache.Options{
 		Redis:      c,
@@ -45,7 +40,6 @@ func NewStandAloneRedisClient(prefix string, timeout time.Duration, c *redis.Cli
 	client := RedisClient{
 		prefix:  prefix,
 		c:       c,
-		redsync: rs,
 		timeout: timeout,
 		cache:   cacheInstance,
 	}

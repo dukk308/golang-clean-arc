@@ -5,19 +5,23 @@ import (
 )
 
 var (
-	serviceNameVal string
-	environmentVal string
-	logLevelVal string
+	serviceNameVal   string
+	environmentVal   string
+	logLevelVal      string
 	callerEnabledVal bool
 	enableTracingVal bool
+	isLogRequestVal  bool
+	isLogResponseVal bool
 )
 
 var (
-	ServiceName = &serviceNameVal
-	Environment = &environmentVal
-	LogLevel = &logLevelVal
+	ServiceName   = &serviceNameVal
+	Environment   = &environmentVal
+	LogLevel      = &logLevelVal
 	CallerEnabled = &callerEnabledVal
 	EnableTracing = &enableTracingVal
+	IsLogRequest  = &isLogRequestVal
+	IsLogResponse = &isLogResponseVal
 )
 
 func init() {
@@ -36,15 +40,23 @@ func init() {
 	if flag.Lookup("enable-tracing") == nil {
 		flag.BoolVar(&enableTracingVal, "enable-tracing", true, "Enable tracing")
 	}
+	if flag.Lookup("is-log-request") == nil {
+		flag.BoolVar(&isLogRequestVal, "is-log-request", true, "Is log request")
+	}
+	if flag.Lookup("is-log-response") == nil {
+		flag.BoolVar(&isLogResponseVal, "is-log-response", false, "Is log response")
+	}
 }
 
 func LoadGlobalConfig() *GlobalConfig {
 	result := &GlobalConfig{
-		ServiceName: *ServiceName,
-		Environment: *Environment,
-		LogLevel: *LogLevel,
+		ServiceName:   *ServiceName,
+		Environment:   *Environment,
+		LogLevel:      *LogLevel,
 		CallerEnabled: *CallerEnabled,
 		EnableTracing: *EnableTracing,
+		IsLogRequest:  *IsLogRequest,
+		IsLogResponse: *IsLogResponse,
 	}
 
 	return result

@@ -310,6 +310,8 @@ func (gdb *GormDB) getDBConn(t GormDBType) (dbConn *gorm.DB, err error) {
 		gdb.withInstrumentation(db)
 	}
 
+	registerAuditHook(db)
+
 	// Configure connection pool settings on primary connection
 	// These will apply when DBResolver is not used
 	if sqlDB, err := db.DB(); err == nil {

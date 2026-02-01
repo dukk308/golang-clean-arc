@@ -9,9 +9,12 @@ import (
 )
 
 type DomainError struct {
-	Message string `json:"message"`
-	Code    string `json:"code"`
-	Err     error  `json:"-"`
+	Message    string      `json:"message"`
+	Code       string      `json:"code"`
+	StatusCode int         `json:"statusCode"`
+	Field      string      `json:"field,omitempty"`
+	Detail     interface{} `json:"details,omitempty"`
+	Err        error       `json:"-"`
 }
 
 func (e *DomainError) Error() string {
@@ -21,14 +24,63 @@ func (e *DomainError) Error() string {
 	return e.Message
 }
 
+func (e *DomainError) GetCode() string {
+	return e.Code
+}
+
+func (e *DomainError) GetStatusCode() int {
+	return e.StatusCode
+}
+
+func (e *DomainError) GetField() string {
+	return e.Field
+}
+
+func (e *DomainError) GetDetails() interface{} {
+	return e.Detail
+}
+
+func (e *DomainError) GetMessage() string {
+	return e.Message
+}
+
+func (e *DomainError) Wrap(err error) *DomainError {
+	return &DomainError{
+		Message:    e.Message,
+		Code:       e.Code,
+		StatusCode: e.StatusCode,
+		Field:      e.Field,
+		Detail:     e.Detail,
+		Err:        err,
+	}
+}
+
 func (e *DomainError) Unwrap() error {
 	return e.Err
 }
 
-func NewDomainError(message string, code string) *DomainError {
+func (e *DomainError) RootCause() error {
+	if e.Err == nil {
+		return nil
+	}
+	for {
+		wrapped := errors.Unwrap(e.Err)
+		if wrapped == nil {
+			break
+		}
+		e.Err = wrapped
+	}
+	return e.Err
+}
+
+func NewDomainError(message string, code string, statusCode int) *DomainError {
 	return &DomainError{
-		Message: message,
-		Code:    code,
+		Message:    message,
+		Code:       code,
+		StatusCode: statusCode,
+		Field:      "",
+		Detail:     nil,
+		Err:        nil,
 	}
 }
 
@@ -55,16 +107,19 @@ func ToDomainError(err error) *DomainError {
 		return nil
 	}
 
+	// If the error is a DomainError, return it
 	if IsDomainError(err) {
 		return err.(*DomainError)
 	}
 
+	// If the error is a database error, normalize it
 	normalized := normalizeDBError(err)
 	if normalized != nil {
 		return normalized
 	}
 
-	return NewDomainError(err.Error(), string(ErrorCodeInternal))
+	// If the error is not a DomainError or a database error, return a generic internal error
+	return NewDomainError(err.Error(), string(ErrorCodeInternal), 500)
 }
 
 func normalizeDBError(err error) *DomainError {
@@ -136,6 +191,9 @@ func extractFieldFromConstraintError(errMsg string) string {
 	if strings.Contains(errMsg, "uni_users_username") || strings.Contains(errMsg, "username") {
 		return "username"
 	}
+	if strings.Contains(errMsg, "uni_notes_slug") || strings.Contains(errMsg, "slug") {
+		return "slug"
+	}
 
 	constraintPatterns := []string{
 		"constraint \"uni_",
@@ -176,37 +234,69 @@ const (
 	ErrorCodeConflict     ErrorCode = "CONFLICT"
 	ErrorCodeInternal     ErrorCode = "INTERNAL_ERROR"
 	ErrorCodeInvalidInput ErrorCode = "INVALID_INPUT"
-	ErrorCodeBusinessRule ErrorCode = "BUSINESS_RULE_VIOLATION"
+	ErrorCodeBusinessRule ErrorCode = "BAD_REQUEST"
 )
 
 func NewValidationError(message string) *DomainError {
-	return NewDomainError(message, string(ErrorCodeValidation))
+	return NewDomainError(
+		message,
+		string(ErrorCodeValidation),
+		400,
+	)
 }
 
 func NewNotFoundError(message string) *DomainError {
-	return NewDomainError(message, string(ErrorCodeNotFound))
+	return NewDomainError(
+		message,
+		string(ErrorCodeNotFound),
+		404,
+	)
 }
 
 func NewUnauthorizedError(message string) *DomainError {
-	return NewDomainError(message, string(ErrorCodeUnauthorized))
+	return NewDomainError(
+		message,
+		string(ErrorCodeUnauthorized),
+		401,
+	)
 }
 
 func NewForbiddenError(message string) *DomainError {
-	return NewDomainError(message, string(ErrorCodeForbidden))
+	return NewDomainError(
+		message,
+		string(ErrorCodeForbidden),
+		403,
+	)
 }
 
 func NewConflictError(message string) *DomainError {
-	return NewDomainError(message, string(ErrorCodeConflict))
+	return NewDomainError(
+		message,
+		string(ErrorCodeConflict),
+		409,
+	)
 }
 
 func NewInternalError(message string) *DomainError {
-	return NewDomainError(message, string(ErrorCodeInternal))
+	return NewDomainError(
+		message,
+		string(ErrorCodeInternal),
+		500,
+	)
 }
 
 func NewInvalidInputError(message string) *DomainError {
-	return NewDomainError(message, string(ErrorCodeInvalidInput))
+	return NewDomainError(
+		message,
+		string(ErrorCodeInvalidInput),
+		400,
+	)
 }
 
 func NewBusinessRuleError(message string) *DomainError {
-	return NewDomainError(message, string(ErrorCodeBusinessRule))
+	return NewDomainError(
+		message,
+		string(ErrorCodeBusinessRule),
+		422,
+	)
 }
