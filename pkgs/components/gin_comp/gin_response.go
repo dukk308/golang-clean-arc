@@ -4,16 +4,16 @@ import (
 	"net/http"
 
 	"github.com/dukk308/beetool.dev-go-starter/internal/common"
+	"github.com/dukk308/beetool.dev-go-starter/pkgs/base"
 	"github.com/dukk308/beetool.dev-go-starter/pkgs/constants"
-	"github.com/dukk308/beetool.dev-go-starter/pkgs/ddd"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
 
 func ResponseError(c *gin.Context, err error) {
 	c.Set(constants.ContextKeyError, err)
-	if ddd.IsDomainError(err) {
-		domainErr := ddd.ToDomainError(err)
+	if base.IsDomainError(err) {
+		domainErr := base.ToDomainError(err)
 		statusCode := getStatusCodeForError(domainErr.Code)
 		c.JSON(statusCode, domainErr)
 		return
@@ -30,29 +30,29 @@ func ResponseError(c *gin.Context, err error) {
 		}
 		c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"errors": errors,
-			"code":   string(ddd.ErrorCodeValidation),
+			"code":   string(base.ErrorCodeValidation),
 		})
 		return
 	}
 
-	normalizedErr := ddd.ToDomainError(err)
+	normalizedErr := base.ToDomainError(err)
 	statusCode := getStatusCodeForError(normalizedErr.Code)
 	c.JSON(statusCode, normalizedErr)
 }
 
 func getStatusCodeForError(code string) int {
 	switch code {
-	case string(ddd.ErrorCodeValidation), string(ddd.ErrorCodeInvalidInput):
+	case string(base.ErrorCodeValidation), string(base.ErrorCodeInvalidInput):
 		return http.StatusBadRequest
-	case string(ddd.ErrorCodeUnauthorized):
+	case string(base.ErrorCodeUnauthorized):
 		return http.StatusUnauthorized
-	case string(ddd.ErrorCodeForbidden):
+	case string(base.ErrorCodeForbidden):
 		return http.StatusForbidden
-	case string(ddd.ErrorCodeNotFound):
+	case string(base.ErrorCodeNotFound):
 		return http.StatusNotFound
-	case string(ddd.ErrorCodeConflict):
+	case string(base.ErrorCodeConflict):
 		return http.StatusConflict
-	case string(ddd.ErrorCodeBusinessRule):
+	case string(base.ErrorCodeBusinessRule):
 		return http.StatusUnprocessableEntity
 	default:
 		return http.StatusInternalServerError

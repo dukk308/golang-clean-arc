@@ -1,4 +1,4 @@
-package ddd
+package base
 
 import (
 	"errors"

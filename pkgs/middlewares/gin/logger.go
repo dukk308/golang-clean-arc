@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dukk308/beetool.dev-go-starter/pkgs/base"
 	"github.com/dukk308/beetool.dev-go-starter/pkgs/constants"
-	"github.com/dukk308/beetool.dev-go-starter/pkgs/ddd"
 	"github.com/dukk308/beetool.dev-go-starter/pkgs/logger"
 	"github.com/gin-gonic/gin"
 )
@@ -138,7 +138,7 @@ func logError(c *gin.Context, log logger.Logger, statusCode int, duration time.D
 	if val, exists := c.Get(constants.ContextKeyError); exists {
 		if err, ok := val.(error); ok && err != nil {
 			errToLog := err
-			if domainErr, ok := ddd.AsDomainError(err); ok && domainErr.Unwrap() != nil {
+			if domainErr, ok := base.AsDomainError(err); ok && domainErr.Unwrap() != nil {
 				if root := domainErr.RootCause(); root != nil {
 					errToLog = root
 				}

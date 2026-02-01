@@ -1,4 +1,4 @@
-package ddd
+package base
 
 import (
 	"time"
@@ -7,7 +7,7 @@ import (
 )
 
 type BaseModel struct {
-	ID        uuid.UUID    `json:"id"`
+	ID        uuid.UUID  `json:"id"`
 	CreatedAt *time.Time `json:"createdAt"`
 	UpdatedAt *time.Time `json:"updatedAt"`
 	DeletedAt *time.Time `json:"deletedAt,omitempty"`

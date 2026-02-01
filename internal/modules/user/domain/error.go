@@ -1,21 +1,21 @@
 package domain
 
-import "github.com/dukk308/beetool.dev-go-starter/pkgs/ddd"
+import "github.com/dukk308/beetool.dev-go-starter/pkgs/base"
 
 var (
-	ErrInvalidUsername = &ddd.DomainError{
+	ErrInvalidUsername = &base.DomainError{
 		Message: "username cannot be empty",
 		Code:    "INVALID_USERNAME",
 	}
-	ErrInvalidEmail = &ddd.DomainError{
+	ErrInvalidEmail = &base.DomainError{
 		Message: "email cannot be empty",
 		Code:    "INVALID_EMAIL",
 	}
-	ErrInvalidRole = &ddd.DomainError{
+	ErrInvalidRole = &base.DomainError{
 		Message: "invalid role",
 		Code:    "INVALID_ROLE",
 	}
-	ErrUnauthorized = &ddd.DomainError{
+	ErrUnauthorized = &base.DomainError{
 		Message: "unauthorized action",
 		Code:    "UNAUTHORIZED",
 	}

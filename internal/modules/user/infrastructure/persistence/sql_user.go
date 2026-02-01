@@ -2,8 +2,8 @@ package persistence
 
 import (
 	"github.com/dukk308/beetool.dev-go-starter/internal/modules/user/domain"
+	common "github.com/dukk308/beetool.dev-go-starter/pkgs/base"
 	"github.com/dukk308/beetool.dev-go-starter/pkgs/components/gorm_comp"
-	common "github.com/dukk308/beetool.dev-go-starter/pkgs/ddd"
 	"github.com/google/uuid"
 )
 

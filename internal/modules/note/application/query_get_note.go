@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/dukk308/beetool.dev-go-starter/internal/modules/note/domain"
-	"github.com/dukk308/beetool.dev-go-starter/pkgs/ddd"
+	"github.com/dukk308/beetool.dev-go-starter/pkgs/base"
 )
 
 type GetNoteQuery struct {
@@ -20,7 +20,7 @@ func NewGetNoteQuery(repository domain.INoteRepository) *GetNoteQuery {
 func (q *GetNoteQuery) ExecuteByID(ctx context.Context, id string) (*domain.DTONoteResponse, error) {
 	note, err := q.repository.GetByID(ctx, id)
 	if err != nil {
-		return nil, ddd.ToDomainError(err)
+		return nil, base.ToDomainError(err)
 	}
 	return domain.NewDTONoteResponse(note), nil
 }
@@ -28,7 +28,7 @@ func (q *GetNoteQuery) ExecuteByID(ctx context.Context, id string) (*domain.DTON
 func (q *GetNoteQuery) ExecuteBySlug(ctx context.Context, slug string) (*domain.DTONoteResponse, error) {
 	note, err := q.repository.GetBySlug(ctx, slug)
 	if err != nil {
-		return nil, ddd.ToDomainError(err)
+		return nil, base.ToDomainError(err)
 	}
 	return domain.NewDTONoteResponse(note), nil
 }

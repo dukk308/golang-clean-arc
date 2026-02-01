@@ -5,7 +5,7 @@ import (
 
 	"github.com/dukk308/beetool.dev-go-starter/internal/modules/auth/domain"
 	user_domain "github.com/dukk308/beetool.dev-go-starter/internal/modules/user/domain"
-	"github.com/dukk308/beetool.dev-go-starter/pkgs/ddd"
+	"github.com/dukk308/beetool.dev-go-starter/pkgs/base"
 )
 
 type SignupCommand struct {
@@ -23,10 +23,10 @@ func NewSignupCommand(
 	}
 }
 
-func (c *SignupCommand) Execute(ctx context.Context, dto *domain.DTOSignup) (*ddd.BaseModel, error) {
+func (c *SignupCommand) Execute(ctx context.Context, dto *domain.DTOSignup) (*base.BaseModel, error) {
 	hashedPassword, err := c.tokenService.HashPassword(dto.Password)
 	if err != nil {
-		return nil, ddd.ToDomainError(err)
+		return nil, base.ToDomainError(err)
 	}
 
 	userDTO := &user_domain.DTOCreateUser{
@@ -38,11 +38,11 @@ func (c *SignupCommand) Execute(ctx context.Context, dto *domain.DTOSignup) (*dd
 
 	viewer, err := user_domain.CreateViewer(userDTO)
 	if err != nil {
-		return nil, ddd.ToDomainError(err)
+		return nil, base.ToDomainError(err)
 	}
 
 	if err := c.repository.Create(ctx, viewer); err != nil {
-		return nil, ddd.ToDomainError(err)
+		return nil, base.ToDomainError(err)
 	}
 
 	return &viewer.BaseModel, nil

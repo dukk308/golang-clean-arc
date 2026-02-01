@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/dukk308/beetool.dev-go-starter/internal/modules/user/domain"
-	"github.com/dukk308/beetool.dev-go-starter/pkgs/ddd"
+	"github.com/dukk308/beetool.dev-go-starter/pkgs/base"
 )
 
 type GetProfileQuery struct {
@@ -20,7 +20,7 @@ func NewGetProfileQuery(repository domain.IViewerRepository) *GetProfileQuery {
 func (q *GetProfileQuery) Execute(ctx context.Context, userID string) (*domain.DTOProfileResponse, error) {
 	viewer, err := q.repository.GetByID(ctx, userID)
 	if err != nil {
-		return nil, ddd.ToDomainError(err)
+		return nil, base.ToDomainError(err)
 	}
 
 	return domain.NewDTOProfileResponse(viewer), nil

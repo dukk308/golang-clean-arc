@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/dukk308/beetool.dev-go-starter/internal/modules/auth/domain"
-	"github.com/dukk308/beetool.dev-go-starter/pkgs/ddd"
+	"github.com/dukk308/beetool.dev-go-starter/pkgs/base"
 )
 
 type RefreshTokenCommand struct {
@@ -28,31 +28,31 @@ func NewRefreshTokenCommand(
 func (c *RefreshTokenCommand) Execute(ctx context.Context, dto *domain.DTORefreshToken) (*domain.DTOTokenResponse, error) {
 	claims, err := c.tokenService.ValidateRefreshToken(dto.RefreshToken)
 	if err != nil {
-		return nil, ddd.ToDomainError(err)
+		return nil, base.ToDomainError(err)
 	}
 
 	isValid, err := c.tokenStorage.IsRefreshTokenValid(ctx, claims.UserID, dto.RefreshToken)
 	if err != nil || !isValid {
-		return nil, ddd.ToDomainError(domain.ErrInvalidToken)
+		return nil, base.ToDomainError(domain.ErrInvalidToken)
 	}
 
 	user, err := c.repository.GetByID(ctx, claims.UserID)
 	if err != nil {
-		return nil, ddd.ToDomainError(domain.ErrInvalidToken)
+		return nil, base.ToDomainError(domain.ErrInvalidToken)
 	}
 
 	accessToken, err := c.tokenService.GenerateAccessToken(user.ID, user.Email, user.Role)
 	if err != nil {
-		return nil, ddd.ToDomainError(err)
+		return nil, base.ToDomainError(err)
 	}
 
 	refreshToken, err := c.tokenService.GenerateRefreshToken(user.ID, user.Email, user.Role)
 	if err != nil {
-		return nil, ddd.ToDomainError(err)
+		return nil, base.ToDomainError(err)
 	}
 
 	if err := c.tokenStorage.StoreRefreshToken(ctx, user.ID, refreshToken); err != nil {
-		return nil, ddd.ToDomainError(err)
+		return nil, base.ToDomainError(err)
 	}
 
 	return &domain.DTOTokenResponse{

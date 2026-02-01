@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/dukk308/beetool.dev-go-starter/internal/modules/auth/domain"
-	"github.com/dukk308/beetool.dev-go-starter/pkgs/ddd"
+	"github.com/dukk308/beetool.dev-go-starter/pkgs/base"
 )
 
 type SigninCommand struct {
@@ -28,25 +28,25 @@ func NewSigninCommand(
 func (c *SigninCommand) Execute(ctx context.Context, dto *domain.DTOSignin) (*domain.DTOTokenResponse, error) {
 	user, err := c.repository.GetByEmail(ctx, dto.Email)
 	if err != nil {
-		return nil, ddd.ToDomainError(domain.ErrInvalidCredentials)
+		return nil, base.ToDomainError(domain.ErrInvalidCredentials)
 	}
 
 	if err := c.tokenService.ComparePassword(user.Password, dto.Password); err != nil {
-		return nil, ddd.ToDomainError(domain.ErrInvalidCredentials)
+		return nil, base.ToDomainError(domain.ErrInvalidCredentials)
 	}
 
 	accessToken, err := c.tokenService.GenerateAccessToken(user.ID, user.Email, user.Role)
 	if err != nil {
-		return nil, ddd.ToDomainError(err)
+		return nil, base.ToDomainError(err)
 	}
 
 	refreshToken, err := c.tokenService.GenerateRefreshToken(user.ID, user.Email, user.Role)
 	if err != nil {
-		return nil, ddd.ToDomainError(err)
+		return nil, base.ToDomainError(err)
 	}
 
 	if err := c.tokenStorage.StoreRefreshToken(ctx, user.ID, refreshToken); err != nil {
-		return nil, ddd.ToDomainError(err)
+		return nil, base.ToDomainError(err)
 	}
 
 	return &domain.DTOTokenResponse{

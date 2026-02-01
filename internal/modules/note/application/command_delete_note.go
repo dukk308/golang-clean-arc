@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/dukk308/beetool.dev-go-starter/internal/modules/note/domain"
-	"github.com/dukk308/beetool.dev-go-starter/pkgs/ddd"
+	"github.com/dukk308/beetool.dev-go-starter/pkgs/base"
 )
 
 type DeleteNoteCommand struct {
@@ -18,5 +18,5 @@ func NewDeleteNoteCommand(repository domain.INoteRepository) *DeleteNoteCommand 
 }
 
 func (c *DeleteNoteCommand) Execute(ctx context.Context, id string) error {
-	return ddd.ToDomainError(c.repository.Delete(ctx, id))
+	return base.ToDomainError(c.repository.Delete(ctx, id))
 }
