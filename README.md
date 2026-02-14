@@ -149,6 +149,46 @@ make swag
 - **App config**: `internal/config/` (e.g. auth secrets).
 - **Flags / env**: see `.env.example` and `go run main.go outenv`. Examples: `-db-dsn`, `-gin-port`, `-rabbitmq-url`, `-redis-addrs`, etc.
 
+### Google OAuth
+
+To enable Google OAuth login:
+
+1. **Create OAuth credentials** in [Google Cloud Console](https://console.cloud.google.com/apis/credentials):
+   - Create OAuth 2.0 Client ID
+   - Add authorized redirect URI: `http://localhost:8080/v1/auth/google/callback`
+   - Copy Client ID and Client Secret
+
+2. **Set environment variables** or use flags:
+
+```bash
+# Environment variables
+export GOOGLE_CLIENT_ID="your-client-id"
+export GOOGLE_CLIENT_SECRET="your-client-secret"
+export GOOGLE_REDIRECT_URL="http://localhost:8080/v1/auth/google/callback"
+
+# Or use flags
+go run main.go serve \
+  -google-client-id="your-client-id" \
+  -google-client-secret="your-client-secret" \
+  -google-redirect-url="http://localhost:8080/v1/auth/google/callback"
+```
+
+3. **Optional custom endpoints** (defaults work for most cases):
+
+```bash
+go run main.go serve \
+  -google-auth-url="https://accounts.google.com/o/oauth2/v2/auth" \
+  -google-token-url="https://oauth2.googleapis.com/token" \
+  -google-user-info-url="https://www.googleapis.com/oauth2/v2/userinfo" \
+  -google-scopes="https://www.googleapis.com/auth/userinfo.email,https://www.googleapis.com/auth/userinfo.profile"
+```
+
+4. **API endpoints**:
+   - `GET /v1/auth/google/url` - Get Google OAuth URL (returns `{"url": "..."}`)
+   - `POST /v1/auth/google/signin` - Exchange code for tokens `{"code": "..."}`
+
+**Note:** If using Google OAuth in production, update the redirect URL in Google Cloud Console to match your production domain.
+
 ## Docker
 
 ### Local infra only

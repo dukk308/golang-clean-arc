@@ -1,0 +1,7 @@
+include:
+  - docker-compose.infras.yml
+  - docker-compose.o11y.yml
+
+networks:
+  app-network:
+    driver: bridge
