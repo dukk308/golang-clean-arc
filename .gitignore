@@ -4,3 +4,5 @@ temp/
 .env
 __debug_bin*
 tmp
+
+beetool.dev-go-starter
